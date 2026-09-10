@@ -3,26 +3,41 @@ package controlador;
 import modelo.BlackJack;
 import modelo.CartaInglesa;
 import modelo.Jugador;
-
-import java.util.ArrayList;
+import modelo.Pila;
 
 public class Controlador{
     private BlackJack blackJack;
-    private int indiceTurnoActual;
+    private Pila<Jugador> porJugar;
+    private Pila<Jugador> yaJugaron;
     private boolean rondaTerminada;
-    private Jugador ultimoJugador;
 
-    public Controlador(ArrayList<Jugador> jugadores){
-        blackJack=new BlackJack(jugadores);
-        indiceTurnoActual=0;
-        rondaTerminada=false;
+    public Controlador(Pila<Jugador> jugadoresIniciales){
+        int cantidad=jugadoresIniciales.getSize();
+        Jugador[] arreglo=new Jugador[cantidad];
+
+        for(int i=cantidad-1;i>=0;i--){
+            arreglo[i]=jugadoresIniciales.pull();
+        }
+
+        Pila<Jugador> paraBlackJack=new Pila<>(cantidad);
+        for(int i=0;i<cantidad;i++){
+            paraBlackJack.push(arreglo[i]);
+        }
+        this.blackJack=new BlackJack(paraBlackJack);
+        this.porJugar=new Pila<>(cantidad);
+        for(int i=cantidad-1;i>=0;i--){
+            this.porJugar.push(arreglo[i]);
+        }
+
+        this.yaJugaron=new Pila<>(cantidad);
+        this.rondaTerminada=false;
     }
 
     public Jugador getJugadorEnTurno(){
-        if(rondaTerminada){
+        if(porJugar.vacia()){
             return null;
         }
-        return blackJack.getJugadores().get(indiceTurnoActual);
+        return porJugar.verTope();
     }
 
     public void pedirCarta(){
@@ -37,6 +52,13 @@ public class Controlador{
         avanzarTurno();
     }
 
+    private void avanzarTurno(){
+        yaJugaron.push(porJugar.pull());
+        if(porJugar.vacia()){
+            finalizarRonda();
+        }
+    }
+
     private void finalizarRonda(){
         blackJack.finalizarRonda();
         rondaTerminada=true;
@@ -46,22 +68,16 @@ public class Controlador{
         return rondaTerminada;
     }
 
-    private void avanzarTurno(){
-        ultimoJugador=getJugadorEnTurno();
-        indiceTurnoActual++;
-        if(indiceTurnoActual>=blackJack.getJugadores().size()){
-            finalizarRonda();
-        }
-    }
-
     public void reiniciarRonda(){
-        blackJack.nuevaRonda();
-        indiceTurnoActual=0;
+        while(!yaJugaron.vacia()){
+            porJugar.push(yaJugaron.pull());
+        }
         rondaTerminada=false;
+        blackJack.nuevaRonda();
     }
 
     public Jugador getUltimoJugador(){
-        return ultimoJugador;
+        return yaJugaron.verTope();
     }
 
     public String getResultado(Jugador jugador){
@@ -72,11 +88,11 @@ public class Controlador{
         return blackJack.getPuntajeCrupier();
     }
 
-    public ArrayList<CartaInglesa> getManoCrupier(){
+    public Pila<CartaInglesa> getManoCrupier(){
         return blackJack.getManoCrupier();
     }
 
-    public ArrayList<Jugador> getJugadores(){
+    public Pila<Jugador> getJugadores(){
         return blackJack.getJugadores();
     }
 }

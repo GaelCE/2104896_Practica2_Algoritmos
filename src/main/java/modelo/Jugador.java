@@ -3,16 +3,16 @@ package modelo;
 import java.util.ArrayList;
 
 public class Jugador {
-    private ArrayList<CartaInglesa> mano;
+    private Pila<CartaInglesa> mano;
     private String nombre;
 
     public Jugador(String nombre){
-        mano = new ArrayList<>();
+        mano = new Pila<>();
         this.nombre = nombre;
     }
 
     public void recibirCarta(CartaInglesa carta){
-        mano.add(carta);
+        mano.push(carta);
     }
 
     public void vaciarMano(){
@@ -20,18 +20,28 @@ public class Jugador {
     }
 
     public void setUpMano(){
-        for (int i=0;i<mano.size();i++){
-            mano.get(i).makeFaceUp();
+        CartaInglesa carta;
+        Pila<CartaInglesa>pilaAuxiliar=new Pila<>(mano.getSize());
+        for (int i=0;i<mano.getSize();i++){
+            carta=mano.pull();
+            carta.makeFaceUp();
+            pilaAuxiliar.push(carta);
+        }
+        for(int i=0;i<pilaAuxiliar.getSize();i++){
+            mano.push(pilaAuxiliar.pull());
         }
     }
 
     //Getters
-    public ArrayList<CartaInglesa> getMano(){ return mano; }
+    public Pila<CartaInglesa> getMano(){ return mano; }
     public String getNombre() { return nombre;}
     public int getPuntaje() {
         int puntaje=0;
         int ases=0;
-        for (CartaInglesa carta : mano){
+        CartaInglesa carta;
+        Pila<CartaInglesa>pilaAuxiliar=new Pila<>(mano.getSize());
+        for (int i=0;i<mano.getSize();i++){
+            carta=mano.pull();
             if (carta.getValor()==14){
                 puntaje+=11;
                 ases++;
@@ -42,6 +52,10 @@ public class Jugador {
             else {
                 puntaje+= carta.getValor();
             }
+            pilaAuxiliar.push(carta);
+        }
+        for(int i=0;i<pilaAuxiliar.getSize();i++){
+            mano.push(pilaAuxiliar.pull());
         }
         while (puntaje>21&&ases>0){
             puntaje-=10;

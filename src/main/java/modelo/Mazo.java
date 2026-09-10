@@ -7,9 +7,10 @@ package modelo;
  */
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Random;
 
 public class Mazo {
-    private ArrayList<CartaInglesa> cartas = new ArrayList<>();
+    private Pila<CartaInglesa> cartas = new Pila<>(52);
 
     public Mazo() {
         llenar(); // crea todas las cartas, excluyendo Jokers
@@ -20,32 +21,44 @@ public class Mazo {
      * Obtiene todas las cartas del mazo.
      * @return
      */
-    public ArrayList<CartaInglesa> getCartas() {
-        return cartas;
-    }
+//    public ArrayList<CartaInglesa> getCartas() {
+//        return cartas;
+//    }
 
     public CartaInglesa obtenerUnaCarta() {
-        if (cartas.size() > 0) {
-            return cartas.remove(0);
-        }
-        return null;
+        return cartas.pull();
     }
+
     private void mezclar() {
-        Collections.shuffle(cartas);
+        Random random=new Random();
+        CartaInglesa [] arregloAuxiliar=new CartaInglesa[52];
+        for (int i=0;i<52;i++){
+            arregloAuxiliar[i]=cartas.pull();
+        }
+        for (int i=0;i<arregloAuxiliar.length;i++){
+            int j= random.nextInt(i+1);
+            CartaInglesa auxiliar=arregloAuxiliar[i];
+            arregloAuxiliar[i]=arregloAuxiliar[j];
+            arregloAuxiliar[j]=auxiliar;
+        }
+
+        for (int i=0;i<52;i++) {
+            cartas.push(arregloAuxiliar[i]);
+        }
     }
 
     private void llenar() {
         for (int i = 2; i <=14 ; i++) {
             for (Palo palo : Palo.values()) {
                 CartaInglesa c = new CartaInglesa(i,palo, palo.getColor());
-                cartas.add(c);
+                cartas.push(c);
             }
         }
     }
 
-    public void ordenar() {
-        Collections.sort(cartas);
-    }
+//    public void ordenar() {
+//        Collections.sort(cartas);
+//    }
 
     @Override
     public String toString() {

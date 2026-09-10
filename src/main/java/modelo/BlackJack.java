@@ -1,23 +1,15 @@
 package modelo;
 
-import java.util.ArrayList;
-
 public class BlackJack{
     private Mazo mazo;
-    private ArrayList<Jugador>jugadores;
+    private Pila<Jugador>jugadores;
     private Crupier crupier;
 
-    public BlackJack(ArrayList<Jugador>jugadores){
+    public BlackJack(Pila<Jugador>jugadores){
         mazo=new Mazo();
         this.jugadores=jugadores;
         crupier=new Crupier();
-        for(int i=0;i<2;i++){
-            for(int j=0;j<jugadores.size();j++){
-                repartirCarta(jugadores.get(j));
-            }
-            repartirCarta(crupier);
-        }
-        crupier.getMano().getFirst().makeFaceUp();
+        repartirLasCartas();
     }
 
     public void repartirCarta(Jugador jugador){
@@ -26,6 +18,26 @@ public class BlackJack{
         if(jugador!=crupier){
             carta.makeFaceUp();
         }
+    }
+
+    public void repartirLasCartas(){
+        int cantidad=jugadores.getSize();
+        Pila<Jugador> pilaAuxiliar=new Pila<>(cantidad);
+        Jugador jugador;
+        for(int i=0;i<2;i++){
+            for(int j=0;j<cantidad;j++){
+                jugador=jugadores.pull();
+                repartirCarta(jugador);
+                pilaAuxiliar.push(jugador);
+            }
+            repartirCarta(crupier);
+            for(int j=0;j<cantidad;j++){
+                jugadores.push(pilaAuxiliar.pull());
+            }
+        }
+        CartaInglesa carta=crupier.getMano().pull();
+        carta.makeFaceUp();
+        crupier.getMano().push(carta);
     }
 
     public String showdown(Jugador jugador){
@@ -41,25 +53,44 @@ public class BlackJack{
     }
 
     public void nuevaRonda(){
-        mazo = new Mazo();
-        for (int i=0;i<jugadores.size();i++){
-            jugadores.get(i).vaciarMano();
-            repartirCarta(jugadores.get(i));
-            repartirCarta(jugadores.get(i));
+        int cantidad=jugadores.getSize();
+        Pila<Jugador> pilaAuxiliar=new Pila<>(cantidad);
+        Jugador jugador;
+        mazo=new Mazo();
+        for(int i=0;i<cantidad;i++){
+            jugador=jugadores.pull();
+            jugador.vaciarMano();
+            repartirCarta(jugador);
+            repartirCarta(jugador);
+            pilaAuxiliar.push(jugador);
+        }
+        for(int i=0;i<cantidad;i++){
+            jugadores.push(pilaAuxiliar.pull());
         }
         crupier.vaciarMano();
         crupier.recibirCarta(mazo.obtenerUnaCarta());
         crupier.recibirCarta(mazo.obtenerUnaCarta());
-        crupier.getMano().getFirst().makeFaceUp();
+        CartaInglesa carta=crupier.getMano().pull();
+        carta.makeFaceUp();
+        crupier.getMano().push(carta);
     }
 
     public boolean todosSePasaron(){
-        for(Jugador jugador:jugadores){
+        int cantidad=jugadores.getSize();
+        Pila<Jugador> pilaAuxiliar=new Pila<>(cantidad);
+        Jugador jugador;
+        boolean todosPasaron=true;
+        for(int i=0;i<cantidad;i++){
+            jugador=jugadores.pull();
             if(!jugador.getSePaso()){
-                return false;
+                todosPasaron=false;
             }
+            pilaAuxiliar.push(jugador);
         }
-        return true;
+        for(int i=0;i<cantidad;i++){
+            jugadores.push(pilaAuxiliar.pull());
+        }
+        return todosPasaron;
     }
 
     public void turnoCrupier(){
@@ -75,7 +106,7 @@ public class BlackJack{
         crupier.setUpMano();
     }
 
-    public ArrayList<Jugador>getJugadores(){
+    public Pila<Jugador>getJugadores(){
         return jugadores;
     }
 
@@ -83,7 +114,7 @@ public class BlackJack{
         return crupier.getPuntaje();
     }
 
-    public ArrayList<CartaInglesa>getManoCrupier(){
+    public Pila<CartaInglesa>getManoCrupier(){
         return crupier.getMano();
     }
 }
