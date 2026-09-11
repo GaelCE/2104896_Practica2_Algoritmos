@@ -11,6 +11,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import modelo.Pila;
+
 import java.util.ArrayList;
 
 public class PantallaConfiguracion extends AnchorPane{
@@ -30,10 +32,10 @@ public class PantallaConfiguracion extends AnchorPane{
         return btnComenzar;
     }
 
-    public ArrayList<Jugador> getJugadores(){
-        ArrayList<Jugador> jugadores=new ArrayList<>();
+    public Pila<Jugador> getJugadores(){
+        Pila<Jugador> jugadores=new Pila<>(nombres.size());
         for(String nombre:nombres){
-            jugadores.add(new Jugador(nombre));
+            jugadores.push(new Jugador(nombre));
         }
         return jugadores;
     }
