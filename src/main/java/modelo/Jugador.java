@@ -21,13 +21,14 @@ public class Jugador {
 
     public void setUpMano(){
         CartaInglesa carta;
-        Pila<CartaInglesa>pilaAuxiliar=new Pila<>(mano.getSize());
-        for (int i=0;i<mano.getSize();i++){
+        int cantidadCartas=mano.getSize();
+        Pila<CartaInglesa> pilaAuxiliar=new Pila<>(cantidadCartas);
+        for(int i=0;i<cantidadCartas;i++){
             carta=mano.pull();
             carta.makeFaceUp();
             pilaAuxiliar.push(carta);
         }
-        for(int i=0;i<pilaAuxiliar.getSize();i++){
+        for(int i=0;i<cantidadCartas;i++){
             mano.push(pilaAuxiliar.pull());
         }
     }
@@ -39,25 +40,24 @@ public class Jugador {
         int puntaje=0;
         int ases=0;
         CartaInglesa carta;
-        Pila<CartaInglesa>pilaAuxiliar=new Pila<>(mano.getSize());
-        for (int i=0;i<mano.getSize();i++){
+        int cantidadCartas=mano.getSize();
+        Pila<CartaInglesa> pilaAuxiliar=new Pila<>(cantidadCartas);
+        for(int i=0;i<cantidadCartas;i++){
             carta=mano.pull();
-            if (carta.getValor()==14){
+            if(carta.getValor()==14){
                 puntaje+=11;
                 ases++;
-            }
-            else if (carta.getValor()>10&&carta.getValor()<14){
+            }else if(carta.getValor()>10&&carta.getValor()<14){
                 puntaje+=10;
-            }
-            else {
-                puntaje+= carta.getValor();
+            }else{
+                puntaje+=carta.getValor();
             }
             pilaAuxiliar.push(carta);
         }
-        for(int i=0;i<pilaAuxiliar.getSize();i++){
+        for(int i=0;i<cantidadCartas;i++){
             mano.push(pilaAuxiliar.pull());
         }
-        while (puntaje>21&&ases>0){
+        while(puntaje>21&&ases>0){
             puntaje-=10;
             ases--;
         }

@@ -18,7 +18,7 @@ public class Pila <T> {
         }else {
             tope++;
             pila[tope]=objeto;
-            System.out.println("Objeto ingresado");
+            //System.out.println("Objeto ingresado");
         }
     }
 
@@ -61,5 +61,23 @@ public class Pila <T> {
         } else {
             return pila[tope];
         }
+    }
+
+    @Override
+    public String toString(){
+        String resultado="";
+        int cantidad=getSize();
+        Pila<T> pilaAuxiliar=new Pila<>(cantidad);
+
+        for(int i=0;i<cantidad;i++){
+            T elemento=pull();
+            resultado=resultado+elemento.toString()+" ";
+            pilaAuxiliar.push(elemento);
+        }
+        for(int i=0;i<cantidad;i++){
+            push(pilaAuxiliar.pull());
+        }
+
+        return resultado;
     }
 }

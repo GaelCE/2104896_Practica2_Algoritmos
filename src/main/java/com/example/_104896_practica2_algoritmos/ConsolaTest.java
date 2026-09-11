@@ -1,7 +1,9 @@
 package com.example._104896_practica2_algoritmos;
 
 import controlador.Controlador;
+import modelo.CartaInglesa;
 import modelo.Jugador;
+import modelo.Pila;
 
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -12,9 +14,9 @@ public class ConsolaTest {
         int decisionSalir;
         int decision;
         do{
-            ArrayList<Jugador> jugadores=new ArrayList<>();
-            jugadores.add(new Jugador("Jugador1"));
-            jugadores.add(new Jugador("Jugador2"));
+            Pila<Jugador> jugadores=new Pila<>();
+            jugadores.push(new Jugador("Jugador1"));
+            jugadores.push(new Jugador("Jugador2"));
             Controlador controlador=new Controlador(jugadores);
             while(!controlador.esRondaTerminada()){
                 Jugador actual=controlador.getJugadorEnTurno();
@@ -36,8 +38,16 @@ public class ConsolaTest {
 
             System.out.println("Mano del crupier: "+controlador.getManoCrupier());
             System.out.println("Puntaje del crupier: "+controlador.getPuntajeCrupier());
-            for(Jugador jugador:controlador.getJugadores()){
-                System.out.println(jugador.getNombre()+": "+jugador.getMano()+" "+controlador.getResultado(jugador));
+            int cantidadJugadores=controlador.getJugadores().getSize();
+            Pila<Jugador> auxiliar=new Pila<>(cantidadJugadores);
+
+            for(int i=0;i<cantidadJugadores;i++){
+                Jugador jugador=controlador.getJugadores().pull();
+                System.out.println(jugador.getNombre()+": "+jugador.getMano().toString()+" "+controlador.getResultado(jugador));
+                auxiliar.push(jugador);
+            }
+            for(int i=0;i<cantidadJugadores;i++){
+                controlador.getJugadores().push(auxiliar.pull());
             }
             do{
                 System.out.println("Desea jugar de nuevo?");
@@ -47,4 +57,5 @@ public class ConsolaTest {
             }while(decisionSalir<1||decisionSalir>2);
         }while(decisionSalir!=2);
     }
+
 }
